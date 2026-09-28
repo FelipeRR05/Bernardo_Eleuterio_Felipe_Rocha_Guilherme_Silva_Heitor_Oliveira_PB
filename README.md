@@ -1,6 +1,6 @@
-# Projeto de Bloco — Análise e Segurança de Agentes de IA
+# Projeto de Bloco - Análise e Segurança de Agentes de IA
 
-**Disciplina:** Análise e Segurança de Agentes de IA — Instituto Infnet
+**Disciplina:** Projeto de Bloco: Análise e Segurança de Agentes de IA - Instituto Infnet
 **Professor:** Tiago Cariolano de Souza Xavier
 **Grupo:** Bernardo de Moraes Eleuterio, Felipe Roberto Rocha, Guilherme Valentim Ramalho da Silva e Heitor Cella Oliveira
 
@@ -8,64 +8,22 @@
 
 ## Objetivo do projeto
 
-Construir um sistema de atendimento ao cliente apoiado por inteligência artificial, com foco na
-**segurança da aplicação** que serve o modelo.
+Construir um sistema de atendimento ao cliente apoiado por IA e, principalmente, **cuidar da
+segurança da aplicação que serve esse sistema**. A ideia do bloco é que, mais para a frente, um
+colega tente invadir esta API - então quanto mais sólida ela estiver agora, melhor.
 
-| Etapa | Escopo | Estado |
-|---|---|---|
-| **TP1** | Escolha do dataset, EDA inicial, estrutura da API com JWT, DFD e tríade CIA | Concluída |
-| **TP2** | EDA aprofundada (correlação, testes de hipótese), controles OWASP Top 10 e auditoria com OWASP ZAP | Concluída |
+Nesta etapa (TP2) entregamos duas coisas:
 
----
+1. O **EDA completo** do dataset de chamados de suporte, com análise multivariada, identificação
+   de outliers e testes de hipótese formais.
+2. A **API FastAPI com os controles do OWASP Top 10 aplicados** e auditada com um scan passivo do
+   OWASP ZAP.
 
-## O que foi entregue no TP2
-
-### Análise exploratória aprofundada
-
-- Heatmap de correlação (Pearson e Spearman) sobre sete variáveis numéricas
-- Quatro scatter plots de pares relevantes para o negócio
-- Teste de hipótese formal (**Mann-Whitney U**, com teste t de Welch como verificação) sobre a
-  Hipótese 3 do TP1
-- Verificação quantitativa do sinal preditivo do dataset (qui-quadrado + baseline TF-IDF)
-- Relatório estruturado em [`eda/RELATORIO_EDA.md`](eda/RELATORIO_EDA.md)
-
-**Principal conclusão:** o dataset é sintético, com colunas geradas independentemente entre si.
-A maior correlação informativa entre as variáveis é |r| ≈ 0,04, e um baseline TF-IDF + Regressão
-Logística atinge 18,9% de acurácia — **abaixo** do modelo trivial (20,7%). O detalhamento e as três
-alternativas propostas para a Etapa 3 estão no relatório de EDA.
-
-### Segurança da API
-
-| Controle | OWASP | Onde |
-|---|---|---|
-| Verificação de ownership (BOLA) | A01 | `fastapi/routes/tickets.py` |
-| Persistência com SQLModel, queries parametrizadas | A03 | `fastapi/database.py` |
-| `extra="forbid"` em todos os modelos de entrada | A08 | `fastapi/models/` |
-| Cabeçalhos de segurança (HSTS, CSP, X-Frame-Options, nosniff) | A05 | `fastapi/security/middleware.py` |
-| CORS com allowlist explícita | A05 | `fastapi/config.py` |
-| Rate limiting no `/auth/token` | A07 | `fastapi/security/rate_limit.py` |
-| Senhas em bcrypt | A02 | `fastapi/security/password.py` |
-
-Documentação completa: [`security/OWASP_CONTROLES.md`](security/OWASP_CONTROLES.md) e
-[`security/RATE_LIMITING.md`](security/RATE_LIMITING.md).
-
-### Auditoria OWASP ZAP
-
-Scan passivo com ZAP 2.16.1, executado em duas etapas (antes e depois dos controles):
-
-| Severidade | ANTES (TP1) | DEPOIS (TP2) |
-|---|---|---|
-| High | 0 | 0 |
-| **Medium** | **30** | **0** |
-| Low | 17 | 0 |
-| Informational | 21 | 18 |
-
-Relatórios exportados em [`security/zap/`](security/zap/) e análise de cada finding em
-[`security/ZAP_FINDINGS.md`](security/ZAP_FINDINGS.md).
-
-### Testes
-
-48 testes automatizados, sendo 36 especificamente de segurança.
+**O principal achado do EDA:** o dataset é sintético e suas colunas foram geradas de forma
+independente umas das outras. A correlação mais forte entre variáveis distintas é |r| ≈ 0,04, e
+69,3% dos chamados começam com exatamente o mesmo texto, rotulado com as cinco intenções. Isso
+significa que o classificador previsto para o TP3 não funcionaria acima do acaso com esses dados.
+A discussão completa e as três alternativas que levantamos estão na seção 1.8 do notebook.
 
 ---
 
@@ -75,206 +33,231 @@ Relatórios exportados em [`security/zap/`](security/zap/) e análise de cada fi
 .
 ├── README.md
 ├── data/
-│   └── customer_support_tickets.csv
+│   └── customer_support_tickets.csv     # dataset usado no projeto
 ├── eda/
-│   ├── EDA_Customer_Support_Tickets.ipynb   # notebook executado, com gráficos
-│   └── RELATORIO_EDA.md                     # relatório estruturado (TP2)
+│   └── EDA_Customer_Support_Tickets.ipynb   # EDA completo (etapas 1.1 a 1.8)
 ├── fastapi/
-│   ├── main.py                  # app, middlewares, CORS, tratadores de erro
-│   ├── run.py                   # inicializador com opções seguras de servidor
-│   ├── config.py                # configuração central (TP2)
-│   ├── database.py              # engine SQLModel e dados iniciais (TP2)
+│   ├── main.py                  # ponto de entrada, middlewares e tratadores de erro
+│   ├── config.py                # configurações (JWT, CORS, CSP, rate limit)
+│   ├── database.py              # engine e sessão do SQLModel
+│   ├── sqlite_database.py       # cria e popula o database.db (sqlite3)
+│   ├── database.db              # banco SQLite já populado
 │   ├── requirements.txt
-│   ├── models/                  # schemas Pydantic e tabelas SQLModel
+│   ├── models/                  # modelos Pydantic e tabelas SQLModel
 │   │   ├── auth.py
 │   │   ├── health.py
-│   │   ├── predict.py
-│   │   ├── ticket.py            # (TP2)
-│   │   └── user.py              # (TP2)
-│   ├── routes/
-│   │   ├── auth.py              # login com rate limiting
-│   │   ├── health.py
-│   │   ├── predict.py
-│   │   └── tickets.py           # CRUD com verificação de ownership (TP2)
-│   ├── security/
-│   │   ├── jwt_handler.py
-│   │   ├── middleware.py        # cabeçalhos de segurança (TP2)
-│   │   ├── oauth2.py
-│   │   ├── password.py          # (TP2)
-│   │   ├── rate_limit.py        # (TP2)
-│   │   └── users.py
-│   └── tests/
-│       ├── conftest.py          # fixtures e banco isolado (TP2)
-│       ├── test_api.py          # testes funcionais
-│       └── test_security.py     # testes de segurança (TP2)
-├── security/
-│   ├── OWASP_CONTROLES.md       # mapa de controles por item do OWASP Top 10
-│   ├── RATE_LIMITING.md         # justificativa técnica do limite escolhido
-│   ├── ZAP_FINDINGS.md          # análise dos findings do scan
-│   └── zap/                     # relatórios exportados + script do scan
+│   │   ├── prediction.py        # tabela prediction + entrada/saída da rota
+│   │   └── user.py              # tabela user
+│   ├── routes/                  # endpoints
+│   │   ├── auth.py              # POST /auth/token (com rate limiting)
+│   │   ├── health.py            # GET /health
+│   │   ├── predict.py           # POST /predict
+│   │   └── predictions.py       # GET /predictions e /predictions/{id} (ownership)
+│   └── security/                # autenticação e controles de segurança
+│       ├── jwt_handler.py       # geração e validação do JWT
+│       ├── middleware.py        # cabeçalhos de segurança HTTP
+│       ├── oauth2.py            # OAuth2PasswordBearer e dependência de autenticação
+│       ├── password.py          # hash bcrypt
+│       └── rate_limit.py        # configuração do SlowAPI
+├── tests/
+│   ├── conftest.py              # banco em memória e fixtures
+│   └── test_security.py         # testes de segurança
+├── zap/
+│   ├── relatorio_zap.html       # relatório exportado do OWASP ZAP
+│   ├── relatorio_zap.json       # o mesmo relatório em JSON
+│   └── scan_passivo_zap.md      # análise dos findings Medium e High
 └── others/
-    └── dfd_api.jpg              # DFD da API (TP1)
+    ├── dfd_api.png              # diagrama de fluxo de dados
+    └── analise_cia.md           # tríade CIA aplicada a cada componente
 ```
 
 ---
 
 ## Instalação
 
-Pré-requisito: Python 3.10 ou superior.
+Pré-requisito: Python 3.10 ou superior (`python3 --version`).
 
 ```bash
+# 1. Clonar o repositório
 git clone <URL-DO-REPOSITORIO>
 cd <NOME-DO-REPOSITORIO>
 
+# 2. Criar e ativar o ambiente virtual
 python3 -m venv .venv
-source .venv/bin/activate        # Linux/macOS
-# .venv\Scripts\activate         # Windows
+source .venv/bin/activate      # Linux / macOS
+# .venv\Scripts\activate       # Windows
 
+# 3. Instalar as dependências da API
 cd fastapi
 pip install -r requirements.txt
+
+# 4. Se for abrir o notebook de EDA, instalar também as dependências da análise
+pip install pandas numpy matplotlib seaborn scipy jupyter
 ```
+
+As dependências estão separadas de propósito: quem só quer rodar ou testar a API não precisa
+instalar pandas, seaborn e companhia.
 
 ---
 
-## Execução
+## Criação e população do banco de dados
 
-### Desenvolvimento
+O projeto já inclui o fastapi/database.db pronto para uso. Caso seja necessário recriá-lo, dentro da pasta fastapi/, execute:
+
+python sqlite_database.py
+
+O script apaga o banco anterior, recria as tabelas user e prediction e insere os dados iniciais, incluindo os usuários admin e analista e três predições de exemplo.
+
+````
+
+### Usuários criados
+
+O sistema possui dois usuários de teste para demonstrar o controle de acesso:
+
+admin → possui as predições 1 e 2.
+analista → possui a predição 3.
+
+A existência de dois usuários permite testar o ownership, verificando que um usuário não consegue acessar as predições do outro.
+
+---
+
+## Execução da API
+
+De dentro da pasta `fastapi/`:
 
 ```bash
-cd fastapi
-python run.py
-```
+uvicorn main:app --reload
+````
 
 A API sobe em <http://127.0.0.1:8000> e a documentação interativa fica em
 <http://127.0.0.1:8000/docs>.
 
-> **Por que `run.py` e não `uvicorn main:app`?** O uvicorn adiciona o cabeçalho `Server: uvicorn` na
-> camada de protocolo, depois que o middleware da aplicação já terminou — então ele não pode ser
-> removido pelo código da API. O `run.py` sobe o servidor já com `server_header=False`. O
-> equivalente por linha de comando é `uvicorn main:app --no-server-header --no-date-header`.
+### Variáveis de ambiente (todas opcionais)
 
-### Produção
+O projeto utiliza variáveis de ambiente para configurar aspectos importantes da aplicação:
 
-```bash
-cd fastapi
-export APP_ENV=production
-export JWT_SECRET_KEY="<chave-forte-vinda-de-um-gerenciador-de-segredos>"
-export CORS_ALLOWED_ORIGINS="https://app.suaempresa.com"
-python run.py
-```
-
-Em produção, `/docs`, `/redoc` e `/openapi.json` são **desabilitados** — eles exigiriam relaxar a
-CSP com `unsafe-inline` e entregariam o mapa completo da API (ver `security/ZAP_FINDINGS.md`).
-
-### Variáveis de ambiente
-
-| Variável | Padrão | Descrição |
-|---|---|---|
-| `APP_ENV` | `development` | `production` ativa o modo endurecido |
-| `JWT_SECRET_KEY` | chave de desenvolvimento | Chave de assinatura dos tokens |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | `30` | Validade do token |
-| `DATABASE_URL` | `sqlite:///./customer_support.db` | Conexão do banco |
-| `CORS_ALLOWED_ORIGINS` | `localhost:3000,localhost:5173,...` | Allowlist de origens |
-| `RATE_LIMIT_LOGIN` | `5/minute` | Limite do endpoint de login |
-| `RATE_LIMIT_DEFAULT` | `100/minute` | Limite das demais rotas |
-| `TRUST_PROXY_HEADERS` | `false` | Só ative atrás de um proxy reverso confiável |
+JWT_SECRET_KEY - chave usada para assinar os tokens.
+ACCESS_TOKEN_EXPIRE_MINUTES - define a validade do token, padrão de 30 minutos.
+DATABASE_URL - configura a conexão com o banco de dados.
+CORS_ALLOWED_ORIGINS - define quais origens podem acessar a API.
+RATE_LIMIT_LOGIN - controla o limite de tentativas de login, padrão de 10 por minuto.
+TRUST_PROXY_HEADERS - permite confiar em cabeçalhos de proxy somente quando houver um proxy reverso confiável.
 
 ---
 
-## Usuários de exemplo
+## Execução dos testes
 
-Criados automaticamente na primeira execução (`database.py`):
+Os testes podem ser executados a partir da raiz do projeto com:
 
-| Usuário | Senha | Papel |
-|---|---|---|
-| `admin` | `admin123` | admin — enxerga todos os chamados |
-| `ana` | `ana12345` | user — dona dos chamados 1 e 2 |
-| `bruno` | `bruno12345` | user — dono do chamado 3 |
-
-Os dois usuários comuns existem para tornar verificável o controle de ownership: sem múltiplos
-usuários reais, não há como testar o acesso ao recurso de outra pessoa.
-
-> Credenciais de demonstração, adequadas apenas ao ambiente didático.
-
----
-
-## Rotas
-
-| Método | Rota | Autenticação | Descrição |
-|---|---|---|---|
-| GET | `/health` | — | Health check |
-| POST | `/auth/token` | — | Login (rate limit: 5/min) |
-| POST | `/predict` | JWT | Classificação de intenção (simulada) |
-| GET | `/tickets/` | JWT | Lista **apenas** os chamados do usuário |
-| POST | `/tickets/` | JWT | Cria chamado (dono vem do token) |
-| GET | `/tickets/{id}` | JWT + ownership | Obtém chamado |
-| PUT | `/tickets/{id}` | JWT + ownership | Atualiza chamado |
-| DELETE | `/tickets/{id}` | JWT + ownership | Remove chamado |
-
-### Exemplo de uso
-
-```bash
-# Login
-TOKEN=$(curl -s -X POST http://127.0.0.1:8000/auth/token \
-  -d "username=ana&password=ana12345" | python -c "import sys,json;print(json.load(sys.stdin)['access_token'])")
-
-# Listar os próprios chamados
-curl http://127.0.0.1:8000/tickets/ -H "Authorization: Bearer $TOKEN"
-
-# Tentar acessar o chamado do Bruno (id 3) -> 404, não 403
-curl -i http://127.0.0.1:8000/tickets/3 -H "Authorization: Bearer $TOKEN"
-
-# Enviar campo extra no corpo -> 422
-curl -i -X POST http://127.0.0.1:8000/tickets/ \
-  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
-  -d '{"titulo":"Teste","descricao":"Texto","owner_id":2}'
-```
-
----
-
-## Testes
-
-```bash
-cd fastapi
 pytest tests/ -v
-```
 
-Resultado esperado: **48 testes aprovados**.
+O resultado esperado é de 15 testes aprovados. Eles utilizam um banco SQLite em memória, sem alterar o database.db do projeto.
 
-| Arquivo | Testes | Cobertura |
-|---|---|---|
-| `tests/test_api.py` | 12 | Rotas, validação e CRUD |
-| `tests/test_security.py` | 36 | Acesso sem token, BOLA, campos extras, cabeçalhos, CORS, rate limiting, vazamento de dados |
+Os três testes principais verificam:
 
-Os três casos exigidos no enunciado do TP2:
-
-| Caso | Classe de teste |
-|---|---|
-| (a) acesso sem token | `TestAcessoSemToken` |
-| (b) acesso a recurso de outro usuário | `TestBrokenObjectLevelAuthorization` |
-| (c) campo extra no corpo da requisição | `TestCamposExtrasProibidos` |
+Acesso sem token sendo recusado;
+Usuário tentando acessar a predição de outro usuário;
+Envio de campo extra no corpo sendo rejeitado com 422.
 
 ---
 
-## Notebook de EDA
+## Rotas da API
 
-```bash
-cd eda
-jupyter notebook EDA_Customer_Support_Tickets.ipynb
-```
+A API possui 5 rotas principais:
 
-O notebook já está executado, com todos os gráficos e resultados salvos. Ele localiza o CSV
-automaticamente, funcionando tanto a partir da pasta `eda/` quanto da raiz do projeto.
+GET /health - verifica se a API está funcionando.
+POST /auth/token - realiza o login e gera o JWT, com limite de 10 tentativas por minuto.
+POST /predict - recebe um texto, identifica a intenção e salva a predição.
+GET /predictions/ - lista apenas as predições do usuário autenticado.
+GET /predictions/{id} - consulta uma predição, desde que pertença ao usuário autenticado.
 
-Dependências da análise:
+### Respostas possíveis de cada rota
 
-```bash
-pip install pandas numpy matplotlib seaborn scipy scikit-learn jupyter
-```
+A API documenta os principais códigos de resposta e controles de segurança:
+
+/health → 200 se estiver funcionando.
+/auth/token → 200, 401, 422 ou 429, conforme o resultado do login.
+/predict → 200 para sucesso, 401 para autenticação inválida e 422 para dados inválidos.
+/predictions → 200, 401, 404 ou 422, conforme acesso e validação.
+
+O fluxo básico é: login → receber JWT → consultar/criar predições → testar bloqueios de acesso.
+
+Usuários inexistentes e senhas erradas retornam o mesmo 401, enquanto recursos inexistentes e de outros usuários retornam 404, evitando vazamento de informações.
 
 ---
 
-## Segurança — DFD e tríade CIA
+## Controles de segurança implementados
 
-O diagrama de fluxo de dados da API está em [`others/dfd_api.jpg`](others/dfd_api.jpg), produzido no
-TP1 junto com a análise da tríade CIA.
+A API possui diversos controles de segurança, incluindo:
+
+JWT + OAuth2 para autenticação.
+bcrypt para proteger as senhas.
+Validação Pydantic com extra='forbid'.
+SQLModel para evitar consultas SQL inseguras.
+Verificação de ownership para impedir acesso indevido a dados (BOLA).
+Cabeçalhos de segurança como HSTS, CSP e X-Frame-Options.
+CORS configurado com allowlist de origens permitidas.
+Rate limiting no login para reduzir tentativas de força bruta.
+
+Os controles estão organizados principalmente nas pastas security/, routes/, além de main.py, config.py e database.py.
+
+### Cabeçalhos de segurança
+
+A API adiciona automaticamente alguns cabeçalhos de segurança para evitar problemas como XSS, clickjacking, cache de dados sensíveis e downgrade para HTTP.
+
+Entre eles estão Strict-Transport-Security, X-Frame-Options, Content-Security-Policy, Referrer-Policy e Cache-Control.
+
+Eles podem ser verificados com:
+
+curl -D - -o /dev/null http://127.0.0.1:8000/health
+
+As páginas /docs e /redoc usam uma CSP um pouco mais permissiva porque o Swagger precisa de scripts para funcionar.
+
+Além disso, o Uvicorn adiciona o Server: uvicorn. A remoção pelo middleware não funciona, pois o cabeçalho é inserido pelo próprio servidor. Para um ambiente mais seguro, pode-se usar --no-server-header.
+
+---
+
+## Rate limiting: o limite escolhido e por quê
+
+Foi adotado um limite de 10 requisições por minuto por IP no POST /auth/token para reduzir:
+
+Força bruta e password spraying;
+Sobrecarga de CPU causada pelo bcrypt;
+Impactos na disponibilidade do serviço.
+
+Com o limite, 10.000 tentativas passam de cerca de 17 minutos para aproximadamente 17 horas, tornando o ataque mais lento e detectável.
+
+Decisões de implementação:
+
+X-Forwarded-For só é confiável quando TRUST_PROXY_HEADERS=true.
+A resposta 429 é genérica para não revelar informações úteis ao atacante.
+Teste: após 10 tentativas, a 11ª retorna HTTP 429.
+
+Limitações: o contador é mantido em memória, não funcionando de forma centralizada em múltiplas réplicas. Além disso, o limite por IP não impede ataques distribuídos; um controle por conta poderia complementar a proteção.
+
+---
+
+## Auditoria com OWASP ZAP
+
+Foi realizado um scan passivo com OWASP ZAP 2.16.1, usando 57 regras em sensibilidade máxima.
+
+High: 0
+Medium: 4
+Low: 2
+Informational: 22
+Endpoints da API: nenhum alerta Medium ou High.
+Os alertas Medium/Low ficaram restritos às páginas /docs e /redoc.
+
+As análises e correções estão em zap/scan_passivo_zap.md, e o relatório completo em zap/relatorio_zap.html.
+
+---
+
+## EDA
+
+O notebook eda/EDA_Customer_Support_Tickets.ipynb já está executado e contém gráficos e resultados das 8 etapas: compreensão, inspeção, qualidade, limpeza, análise univariada e multivariada, outliers/anomalias e conclusões. Pode ser executado novamente com Jupyter após instalar as dependências.
+
+---
+
+## Modelagem de ameaças
+
+O DFD está em others/dfd_api.png, identificando 3 fronteiras de confiança: internet, servidor da API e zona autenticada. A análise da tríade CIA (Confidencialidade, Integridade e Disponibilidade) dos 8 componentes está em others/analise_cia.md.

@@ -1,8 +1,10 @@
+"""Modelo de resposta do health check."""
+
 from pydantic import BaseModel
 
 
 class HealthResponse(BaseModel):
-    """Corpo de resposta da rota de health check."""
+    """O que GET /health devolve."""
 
     status: str
     service: str

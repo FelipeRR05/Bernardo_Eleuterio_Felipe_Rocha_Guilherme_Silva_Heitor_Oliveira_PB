@@ -1,15 +1,17 @@
-"""Ponto de entrada da aplicação FastAPI.
+"""Ponto de entrada da API.
 
-Execução local:
+Para rodar, de dentro da pasta fastapi/:
+
     uvicorn main:app --reload
 
-Documentação interativa (Swagger):
-    http://127.0.0.1:8000/docs
+A documentação interativa fica em http://127.0.0.1:8000/docs
+
+Antes do primeiro uso é preciso criar o banco:
+
+    python sqlite_database.py
 """
 
-from contextlib import asynccontextmanager
-
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -17,57 +19,45 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
 from config import (
-    CORS_CABECALHOS_PERMITIDOS,
-    CORS_METODOS_PERMITIDOS,
-    CORS_ORIGENS_PERMITIDAS,
-    EM_PRODUCAO,
+    CABECALHOS_PERMITIDOS,
+    METODOS_PERMITIDOS,
+    ORIGENS_PERMITIDAS,
 )
-from database import criar_tabelas, popular_dados_iniciais
-from routes import auth, health, predict, tickets
-from security.middleware import SecurityHeadersMiddleware
-from security.rate_limit import limiter, tratar_limite_excedido
-
-
-@asynccontextmanager
-async def ciclo_de_vida(app: FastAPI):
-    """Prepara o banco de dados na subida da aplicação."""
-    criar_tabelas()
-    popular_dados_iniciais()
-    yield
-
+from routes import auth, health, predict, predictions
+from security.middleware import CabecalhosDeSeguranca
+from security.rate_limit import limiter, resposta_de_limite_excedido
 
 app = FastAPI(
     title="Customer Support Intent API",
-    description="API do sistema de atendimento ao cliente do Projeto de Bloco.",
-    version="0.2.0",
-    lifespan=ciclo_de_vida,
-    docs_url=None if EM_PRODUCAO else "/docs",
-    redoc_url=None if EM_PRODUCAO else "/redoc",
-    openapi_url=None if EM_PRODUCAO else "/openapi.json",
+    description=(
+        "API do sistema de atendimento ao cliente do Projeto de Bloco. "
+        "Etapa 2: controles do OWASP Top 10 aplicados e auditados com OWASP ZAP."
+    ),
+    version="2.0.0",
 )
 
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, tratar_limite_excedido)
+app.add_exception_handler(RateLimitExceeded, resposta_de_limite_excedido)
 app.add_middleware(SlowAPIMiddleware)
 
-app.add_middleware(SecurityHeadersMiddleware)
+
+app.add_middleware(CabecalhosDeSeguranca)
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGENS_PERMITIDAS,
+    allow_origins=ORIGENS_PERMITIDAS,
     allow_credentials=True,
-    allow_methods=CORS_METODOS_PERMITIDOS,
-    allow_headers=CORS_CABECALHOS_PERMITIDOS,
-    max_age=600,
+    allow_methods=METODOS_PERMITIDOS,
+    allow_headers=CABECALHOS_PERMITIDOS,
 )
 
-
 @app.exception_handler(RequestValidationError)
-async def tratar_erro_de_validacao(
+async def erro_de_validacao(
     request: Request, exc: RequestValidationError
 ) -> JSONResponse:
-    """Normaliza os erros de validação do Pydantic para não vazar o input original."""
-    erros_sanitizados = [
+
+    erros = [
         {
             "campo": ".".join(str(parte) for parte in erro.get("loc", [])),
             "mensagem": erro.get("msg", ""),
@@ -75,19 +65,19 @@ async def tratar_erro_de_validacao(
         }
         for erro in exc.errors()
     ]
-    return JSONResponse(status_code=422, content={"detail": erros_sanitizados})
+
+    return JSONResponse(status_code=422, content={"detail": erros})
 
 
 @app.exception_handler(Exception)
-async def tratar_erro_inesperado(request: Request, exc: Exception) -> JSONResponse:
-    """Evita que stack traces cheguem ao cliente em erros inesperados."""
+async def erro_inesperado(request: Request, exc: Exception) -> JSONResponse:
+
     return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": "Erro interno do servidor"},
+        status_code=500, content={"detail": "Erro interno do servidor"}
     )
 
 
 app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(predict.router)
-app.include_router(tickets.router)
+app.include_router(predictions.router)

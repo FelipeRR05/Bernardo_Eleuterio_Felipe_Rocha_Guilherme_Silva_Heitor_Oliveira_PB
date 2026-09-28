@@ -1,0 +1,422 @@
+{
+	"@programName": "ZAP",
+	"@version": "2.16.1",
+	"@generated": "Sun, 27 Sept 2026 16:24:57",
+	"site":[ 
+		{
+			"@name": "http://127.0.0.1:8000",
+			"@host": "127.0.0.1",
+			"@port": "8000",
+			"@ssl": "false",
+			"alerts": [ 
+				{
+					"pluginid": "10055",
+					"alertRef": "10055-5",
+					"alert": "CSP: script-src unsafe-inline",
+					"name": "CSP: script-src unsafe-inline",
+					"riskcode": "2",
+					"confidence": "3",
+					"riskdesc": "Medium (High)",
+					"desc": "<p>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks. Including (but not limited to) Cross Site Scripting (XSS), and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page \u2014 covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</p>",
+					"instances":[ 
+						{
+							"id": "6",
+							"uri": "http://127.0.0.1:8000/docs",
+							"method": "GET",
+							"param": "content-security-policy",
+							"attack": "",
+							"evidence": "default-src 'none'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://fastapi.tiangolo.com data:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+							"otherinfo": "script-src includes unsafe-inline."
+						},
+						{
+							"id": "8",
+							"uri": "http://127.0.0.1:8000/redoc",
+							"method": "GET",
+							"param": "content-security-policy",
+							"attack": "",
+							"evidence": "default-src 'none'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://fastapi.tiangolo.com data:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+							"otherinfo": "script-src includes unsafe-inline."
+						}
+					],
+					"count": "2",
+					"solution": "<p>Ensure that your web server, application server, load balancer, etc. is properly configured to set the Content-Security-Policy header.</p>",
+					"otherinfo": "<p>script-src includes unsafe-inline.</p>",
+					"reference": "<p>https://www.w3.org/TR/CSP/</p><p>https://caniuse.com/#search=content+security+policy</p><p>https://content-security-policy.com/</p><p>https://github.com/HtmlUnit/htmlunit-csp</p><p>https://developers.google.com/web/fundamentals/security/csp#policy_applies_to_a_wide_variety_of_resources</p>",
+					"cweid": "693",
+					"wascid": "15",
+					"sourceid": "6"
+				},
+				{
+					"pluginid": "10055",
+					"alertRef": "10055-6",
+					"alert": "CSP: style-src unsafe-inline",
+					"name": "CSP: style-src unsafe-inline",
+					"riskcode": "2",
+					"confidence": "3",
+					"riskdesc": "Medium (High)",
+					"desc": "<p>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks. Including (but not limited to) Cross Site Scripting (XSS), and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page \u2014 covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</p>",
+					"instances":[ 
+						{
+							"id": "7",
+							"uri": "http://127.0.0.1:8000/docs",
+							"method": "GET",
+							"param": "content-security-policy",
+							"attack": "",
+							"evidence": "default-src 'none'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://fastapi.tiangolo.com data:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+							"otherinfo": "style-src includes unsafe-inline."
+						},
+						{
+							"id": "9",
+							"uri": "http://127.0.0.1:8000/redoc",
+							"method": "GET",
+							"param": "content-security-policy",
+							"attack": "",
+							"evidence": "default-src 'none'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://fastapi.tiangolo.com data:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+							"otherinfo": "style-src includes unsafe-inline."
+						}
+					],
+					"count": "2",
+					"solution": "<p>Ensure that your web server, application server, load balancer, etc. is properly configured to set the Content-Security-Policy header.</p>",
+					"otherinfo": "<p>style-src includes unsafe-inline.</p>",
+					"reference": "<p>https://www.w3.org/TR/CSP/</p><p>https://caniuse.com/#search=content+security+policy</p><p>https://content-security-policy.com/</p><p>https://github.com/HtmlUnit/htmlunit-csp</p><p>https://developers.google.com/web/fundamentals/security/csp#policy_applies_to_a_wide_variety_of_resources</p>",
+					"cweid": "693",
+					"wascid": "15",
+					"sourceid": "6"
+				},
+				{
+					"pluginid": "10017",
+					"alertRef": "10017",
+					"alert": "Cross-Domain JavaScript Source File Inclusion",
+					"name": "Cross-Domain JavaScript Source File Inclusion",
+					"riskcode": "1",
+					"confidence": "2",
+					"riskdesc": "Low (Medium)",
+					"desc": "<p>The page includes one or more script files from a third-party domain.</p>",
+					"instances":[ 
+						{
+							"id": "11",
+							"uri": "http://127.0.0.1:8000/docs",
+							"method": "GET",
+							"param": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
+							"attack": "",
+							"evidence": "<script src=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js\"></script>",
+							"otherinfo": ""
+						},
+						{
+							"id": "10",
+							"uri": "http://127.0.0.1:8000/redoc",
+							"method": "GET",
+							"param": "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js",
+							"attack": "",
+							"evidence": "<script src=\"https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js\"> </script>",
+							"otherinfo": ""
+						}
+					],
+					"count": "2",
+					"solution": "<p>Ensure JavaScript source files are loaded from only trusted sources, and the sources can't be controlled by end users of the application.</p>",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "829",
+					"wascid": "15",
+					"sourceid": "6"
+				},
+				{
+					"pluginid": "10111",
+					"alertRef": "10111",
+					"alert": "Authentication Request Identified",
+					"name": "Authentication Request Identified",
+					"riskcode": "0",
+					"confidence": "1",
+					"riskdesc": "Informational (Low)",
+					"desc": "<p>The given request has been identified as an authentication request. The 'Other Info' field contains a set of key=value lines which identify any relevant fields. If the request is in a context which has an Authentication Method set to \"Auto-Detect\" then this rule will change the authentication to match the request identified.</p>",
+					"instances":[ 
+						{
+							"id": "1",
+							"uri": "http://127.0.0.1:8000/auth/token",
+							"method": "POST",
+							"param": "username",
+							"attack": "",
+							"evidence": "password",
+							"otherinfo": "userParam=username\nuserValue=admin\npasswordParam=password"
+						},
+						{
+							"id": "3",
+							"uri": "http://127.0.0.1:8000/auth/token",
+							"method": "POST",
+							"param": "username",
+							"attack": "",
+							"evidence": "password",
+							"otherinfo": "userParam=username\nuserValue=analista\npasswordParam=password"
+						}
+					],
+					"count": "2",
+					"solution": "<p>This is an informational alert rather than a vulnerability and so there is nothing to fix.</p>",
+					"otherinfo": "<p>userParam=username</p><p>userValue=admin</p><p>passwordParam=password</p>",
+					"reference": "<p>https://www.zaproxy.org/docs/desktop/addons/authentication-helper/auth-req-id/</p>",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "1"
+				},
+				{
+					"pluginid": "90011",
+					"alertRef": "90011",
+					"alert": "Charset Mismatch (Meta Content-Type Charset Missing)",
+					"name": "Charset Mismatch (Meta Content-Type Charset Missing)",
+					"riskcode": "0",
+					"confidence": "1",
+					"riskdesc": "Informational (Low)",
+					"desc": "<p>This check identifies responses where the HTTP Content-Type header declares a charset different from the charset defined by the body of the HTML or XML. When there's a charset mismatch between the HTTP header and content body Web browsers can be forced into an undesirable content-sniffing mode to determine the content's correct character set.</p><p></p><p>An attacker could manipulate content on the page to be interpreted in an encoding of their choice. For example, if an attacker can control content at the beginning of the page, they could inject script using UTF-7 encoded text and manipulate some browsers into interpreting that text.</p>",
+					"instances":[ 
+						{
+							"id": "5",
+							"uri": "http://127.0.0.1:8000/redoc",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "Charset is defined only by META charset, older clients that expect character set to be defined by META content-type may not correctly display this content."
+						}
+					],
+					"count": "1",
+					"solution": "<p>Force UTF-8 for all text content in both the HTTP header and meta tags in HTML or encoding declarations in XML.</p>",
+					"otherinfo": "<p>Charset is defined only by META charset, older clients that expect character set to be defined by META content-type may not correctly display this content.</p>",
+					"reference": "<p>https://code.google.com/p/browsersec/wiki/Part2#Character_set_handling_and_detection</p>",
+					"cweid": "436",
+					"wascid": "15",
+					"sourceid": "7"
+				},
+				{
+					"pluginid": "10109",
+					"alertRef": "10109",
+					"alert": "Modern Web Application",
+					"name": "Modern Web Application",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The application appears to be a modern web application. If you need to explore it automatically then the Ajax Spider may well be more effective than the standard one.</p>",
+					"instances":[ 
+						{
+							"id": "12",
+							"uri": "http://127.0.0.1:8000/docs",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "<script src=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js\"></script>",
+							"otherinfo": "No links have been found while there are scripts, which is an indication that this is a modern web application."
+						},
+						{
+							"id": "14",
+							"uri": "http://127.0.0.1:8000/redoc",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "<script src=\"https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js\"> </script>",
+							"otherinfo": "No links have been found while there are scripts, which is an indication that this is a modern web application."
+						}
+					],
+					"count": "2",
+					"solution": "<p>This is an informational alert and so no changes are required.</p>",
+					"otherinfo": "<p>No links have been found while there are scripts, which is an indication that this is a modern web application.</p>",
+					"reference": "",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "6"
+				},
+				{
+					"pluginid": "10112",
+					"alertRef": "10112",
+					"alert": "Session Management Response Identified",
+					"name": "Session Management Response Identified",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>The given response has been identified as containing a session management token. The 'Other Info' field contains a set of header tokens that can be used in the Header Based Session Management Method. If the request is in a context which has a Session Management Method set to \"Auto-Detect\" then this rule will change the session management to use the tokens identified.</p>",
+					"instances":[ 
+						{
+							"id": "18",
+							"uri": "http://127.0.0.1:8000/auth/token",
+							"method": "GET",
+							"param": "access_token",
+							"attack": "",
+							"evidence": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidXNlcm5hbWUiOiJhZG1pbiIsImlhdCI6MTc5MDUyNjI4MiwiZXhwIjoxNzkwNTI4MDgyfQ.4X55N2Ow0Yrng_6z2LcUf5hEHufLI-eJtF3PrRQ62kw",
+							"otherinfo": "\njson:access_token"
+						},
+						{
+							"id": "27",
+							"uri": "http://127.0.0.1:8000/auth/token",
+							"method": "GET",
+							"param": "access_token",
+							"attack": "",
+							"evidence": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwidXNlcm5hbWUiOiJhbmFsaXN0YSIsImlhdCI6MTc5MDUyNjI4MywiZXhwIjoxNzkwNTI4MDgzfQ.Thkjo5BG45eDKS32ayw-drW1f2hXuydrwFTi7bZMqjw",
+							"otherinfo": "\njson:access_token"
+						},
+						{
+							"id": "33",
+							"uri": "http://127.0.0.1:8000/auth/token",
+							"method": "POST",
+							"param": "access_token",
+							"attack": "",
+							"evidence": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidXNlcm5hbWUiOiJhZG1pbiIsImlhdCI6MTc5MDUyNjI4MiwiZXhwIjoxNzkwNTI4MDgyfQ.4X55N2Ow0Yrng_6z2LcUf5hEHufLI-eJtF3PrRQ62kw",
+							"otherinfo": "\njson:access_token"
+						}
+					],
+					"count": "3",
+					"solution": "<p>This is an informational alert rather than a vulnerability and so there is nothing to fix.</p>",
+					"otherinfo": "<p></p><p>json:access_token</p>",
+					"reference": "<p>https://www.zaproxy.org/docs/desktop/addons/authentication-helper/session-mgmt-id</p>",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "10"
+				},
+				{
+					"pluginid": "10035",
+					"alertRef": "10035-4",
+					"alert": "Strict-Transport-Security Header on Plain HTTP Response",
+					"name": "Strict-Transport-Security Header on Plain HTTP Response",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>A HTTP Strict Transport Security (HSTS) header was found, but HSTS headers are ignored on plain (non-HTTPS) responses.</p><p>HTTP Strict Transport Security (HSTS) is a web security policy mechanism whereby a web server declares that complying user agents (such as a web browser) are to interact with it using only secure HTTPS connections (i.e. HTTP layered over TLS/SSL).</p>",
+					"instances":[ 
+						{
+							"id": "16",
+							"uri": "http://127.0.0.1:8000/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						},
+						{
+							"id": "38",
+							"uri": "http://127.0.0.1:8000/.env",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						},
+						{
+							"id": "35",
+							"uri": "http://127.0.0.1:8000/admin",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						},
+						{
+							"id": "13",
+							"uri": "http://127.0.0.1:8000/docs",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						},
+						{
+							"id": "4",
+							"uri": "http://127.0.0.1:8000/health",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						},
+						{
+							"id": "19",
+							"uri": "http://127.0.0.1:8000/openapi.json",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						},
+						{
+							"id": "17",
+							"uri": "http://127.0.0.1:8000/predictions/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						},
+						{
+							"id": "20",
+							"uri": "http://127.0.0.1:8000/predictions/1",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						},
+						{
+							"id": "21",
+							"uri": "http://127.0.0.1:8000/predictions/2",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						},
+						{
+							"id": "23",
+							"uri": "http://127.0.0.1:8000/predictions/3",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						},
+						{
+							"id": "29",
+							"uri": "http://127.0.0.1:8000/predictions/9999",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						},
+						{
+							"id": "15",
+							"uri": "http://127.0.0.1:8000/redoc",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						},
+						{
+							"id": "0",
+							"uri": "http://127.0.0.1:8000/auth/token",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						},
+						{
+							"id": "31",
+							"uri": "http://127.0.0.1:8000/predict",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "max-age=63072000; includeSubDomains; preload",
+							"otherinfo": ""
+						}
+					],
+					"count": "14",
+					"solution": "<p>Review the configuration of this control. Ensure that your web server, application server, load balancer, etc. is configured to set Strict-Transport-Security for HTTPS responses.</p>",
+					"otherinfo": "",
+					"reference": "<p>https://datatracker.ietf.org/doc/html/rfc6797#section-8.1</p>",
+					"cweid": "319",
+					"wascid": "15",
+					"sourceid": "9"
+				}
+			]
+		}
+	],
+	"sequences":[
+	]
+
+}

@@ -5,12 +5,3 @@ __pycache__/
 venv/
 .env
 .ipynb_checkpoints/
-
-# Banco de dados SQLite gerado em tempo de execução (recriado na subida da API)
-*.db
-*.sqlite
-*.sqlite3
-
-# Saídas locais do OWASP ZAP (os relatórios versionados ficam em security/zap/)
-zap_home/
-*.session
